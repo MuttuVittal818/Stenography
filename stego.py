@@ -1,8 +1,8 @@
 import cv2
 import os
 
-# Load the image (Ensure correct path)
-image_path = "Photo.jpg"  # Place the image in the working directory
+# Place the image in the working directory
+image_path = "Photo.jpg"  
 img = cv2.imread(image_path)
 
 if img is None:
@@ -24,7 +24,8 @@ c = {i: chr(i) for i in range(256)}
 n, m = 0, 0  # Row, Column positions
 
 for i in range(len(msg)):
-    if n >= height:  # If message exceeds image size
+    # If message exceeds image size
+    if n >= height:  
         print("Error: Message is too long for this image!")
         exit()
     

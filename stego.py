@@ -1,44 +1,55 @@
 import cv2
 import os
-import string
 
-img = cv2.imread("D:\\Edu Fundation Internship 2025\\Stenography\\Photo.jpg") # Replace with the correct image path#image
+# Load the image (Ensure correct path)
+image_path = "Photo.jpg"  # Place the image in the working directory
+img = cv2.imread(image_path)
 
-msg = input("Enter secret message:")
-password = input("Enter a passcode:")
+if img is None:
+    print("Error: Could not load the image. Check the file path.")
+    exit()
 
-d = {}
-c = {}
+# Get the image dimensions
+height, width, _ = img.shape
 
-for i in range(255):
-    d[chr(i)] = i
-    c[i] = chr(i)
+# Secret message input
+msg = input("Enter secret message: ")
+password = input("Enter a passcode: ")
 
-m = 0
-n = 0
-z = 0
+# Mapping characters to ASCII values
+d = {chr(i): i for i in range(256)}
+c = {i: chr(i) for i in range(256)}
+
+# Encoding message into the image
+n, m = 0, 0  # Row, Column positions
 
 for i in range(len(msg)):
-    img[n, m, z] = d[msg[i]]
-    n = n + 1
-    m = m + 1
-    z = (z + 1) % 3
+    if n >= height:  # If message exceeds image size
+        print("Error: Message is too long for this image!")
+        exit()
+    
+    img[n, m, 0] = d[msg[i]]  # Store ASCII in the Blue channel
+    m += 1
+    if m >= width:  # Move to next row if column limit exceeds
+        m = 0
+        n += 1
 
+# Save and open the encoded image
 cv2.imwrite("encryptedImage.jpg", img)
-os.system("start encryptedImage.jpg")  # Use 'start' to open the image on Windows
+os.system("start encryptedImage.jpg")  # Opens the image (Windows)
 
+# Decryption process
 message = ""
-n = 0
-m = 0
-z = 0
+n, m = 0, 0
 
-pas = input("Enter passcode for Decryption")
+pas = input("Enter passcode for decryption: ")
 if password == pas:
     for i in range(len(msg)):
-        message = message + c[img[n, m, z]]
-        n = n + 1
-        m = m + 1
-        z = (z + 1) % 3
-    print("Decryption message:", message)
+        message += c[img[n, m, 0]]
+        m += 1
+        if m >= width:
+            m = 0
+            n += 1
+    print("Decrypted message:", message)
 else:
-    print("YOU ARE NOT auth")
+    print("Access Denied: Incorrect passcode!")
